@@ -68,7 +68,7 @@ class MainVerticle : AbstractVerticle() {
       }
     }
 
-    this.dbClient = dbClient;
+    this.dbClient = dbClient
 
     return future
   }
@@ -81,6 +81,7 @@ class MainVerticle : AbstractVerticle() {
           connection.close();
 
           if (res.succeeded()) {
+            // todo move to own endpóint and use as REST API
             val pages = res.result()
               .getResults()
               .stream()
@@ -90,6 +91,8 @@ class MainVerticle : AbstractVerticle() {
 
             context.put("title", "Wiki home");
             context.put("pages", pages);
+
+            // fuck the template engines
             templateEngine.render(context, "templates", "/index.ftl", { ar: AsyncResult<Buffer> ->
               when (ar.succeeded()) {
                 true -> {
