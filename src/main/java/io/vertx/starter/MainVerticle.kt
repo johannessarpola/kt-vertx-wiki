@@ -1,22 +1,20 @@
 package io.vertx.starter;
 
 import com.github.rjeschke.txtmark.Processor
-import io.vertx.core.Launcher;
-
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult
+import com.sun.javaws.exceptions.MissingFieldException
+import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
-import io.vertx.core.buffer.Buffer
+import io.vertx.core.cli.MissingValueException
+import io.vertx.core.http.HttpServerRequest
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.core.logging.LoggerFactory
-import io.vertx.ext.sql.ResultSet
-import io.vertx.ext.sql.SQLConnection
+import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.templ.FreeMarkerTemplateEngine
+import io.vertx.utils.RequestUtils.getParam
 import java.util.*
 import java.util.stream.Collectors
 
@@ -101,8 +99,7 @@ class MainVerticle : AbstractVerticle() {
             templateEngine.render(context, "templates", "/index.ftl", { ar ->
               when (ar.succeeded()) {
                 true -> {
-                  context.response().putHeader("Content-Type", "text/html")
-                  context.response().end(ar.result());
+                  context.response().putHeader("Content-Type", "text/html").end(ar.result());
                 }
                 false -> context.fail(ar.cause());
               }
@@ -144,8 +141,7 @@ class MainVerticle : AbstractVerticle() {
 
             templateEngine.render(context, "templates", "/page.ftl", { ar ->
               if (ar.succeeded()) {
-                context.response().putHeader("Content-Type", "text/html");
-                context.response().end(ar.result());
+                context.response().putHeader("Content-Type", "text/html").end(ar.result());
               } else {
                 context.fail(ar.cause());
               }
@@ -162,17 +158,69 @@ class MainVerticle : AbstractVerticle() {
       }
     }
   }
-
   private fun pageUpdateHandler(context: RoutingContext) {
+    val request = context.request()
+
+    val id = getParam(name = "id", request = request)
+    val title = getParam(name = "title", request = request)
+    val markdown = getParam(name = "markdown", request = request)
+    val newPage = "yes" == getParam(name= "newPage", request = request)
+
+    dbClient?.getConnection { car ->
+      if (car.succeeded()) {
+        val connection = car.result()
+        val sql = if(newPage) SQL_CREATE_PAGE else SQL_SAVE_PAGE
+        val params = JsonArray()
+        if (newPage) { params.add(title).add(markdown) }
+        else { params.add(markdown).add(id) }
+
+        connection.updateWithParams(sql, params, { res ->
+          connection.close();
+          if (res.succeeded()) {
+            context.response().setStatusCode(303).putHeader("Location", "/wiki/" + title).end()
+          } else {
+            context.fail(res.cause())
+          }
+        })
+      }
+      else {
+        context.fail(car.cause());
+      }
+    }
 
   }
 
   private fun pageCreateHandler(context: RoutingContext) {
+    val pageName = context.request().getParam("name");
 
+    val location = if(pageName == null || pageName.isEmpty()) "/" else "/wiki/" + pageName;
+
+    context.response()
+      .setStatusCode(303)
+      .putHeader("Location", location)
+      .end()
   }
 
   private fun pageDeletionHandler(context: RoutingContext) {
+    val request = context.request()
 
+    val id = getParam(name = "id", request = request)
+
+    dbClient?.getConnection { car ->
+      if (car.succeeded()) {
+        val connection = car.result()
+        connection.updateWithParams(SQL_DELETE_PAGE, JsonArray().add(id), { res ->
+          connection.close();
+          if (res.succeeded()) {
+            context.response().setStatusCode(303).putHeader("Location", "/").end()
+          } else {
+            context.fail(res.cause())
+          }
+        });
+      } else {
+        context.fail(car.cause())
+      }
+    }
   }
 
   private fun startHttpServer(): Future<Void> {
