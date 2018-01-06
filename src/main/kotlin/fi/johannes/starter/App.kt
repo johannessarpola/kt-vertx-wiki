@@ -1,5 +1,5 @@
 import io.vertx.core.Vertx
-import io.vertx.starter.MainVerticle
+import fi.johannes.starter.MainVerticle
 
 fun main(args: Array<String>) {
   val vertx = Vertx.vertx()

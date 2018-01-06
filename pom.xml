@@ -11,7 +11,7 @@
 
   <properties>
     <vertx.version>3.5.0</vertx.version>
-    <main.verticle>io.vertx.starter.MainVerticle</main.verticle>
+    <main.verticle>fi.johannes.starter.MainVerticle</main.verticle>
     <kotlin.version>1.2.10</kotlin.version>
     <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     <experimentalCoroutines>enable</experimentalCoroutines>
@@ -53,7 +53,12 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-lang-kotlin-coroutines</artifactId>
-      <version>${project.version}</version>
+      <version>3.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.salomonbrys.kodein</groupId>
+      <artifactId>kodein</artifactId>
+      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -157,7 +162,7 @@
             <configuration>
               <sourceDirs>
                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                <sourceDir>src/main/kotlin</sourceDir>
               </sourceDirs>
             </configuration>
           </execution>

@@ -1,11 +1,14 @@
-package io.vertx.starter;
+package fi.johannes.starter;
 
 import com.github.rjeschke.txtmark.Processor
-import com.sun.javaws.exceptions.MissingFieldException
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.instance
+import com.github.salomonbrys.kodein.singleton
+import fi.johannes.handlers.HandlerModule
+import fi.johannes.handlers.wiki.Index.Index
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
-import io.vertx.core.cli.MissingValueException
-import io.vertx.core.http.HttpServerRequest
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
@@ -14,7 +17,10 @@ import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.templ.FreeMarkerTemplateEngine
-import io.vertx.utils.RequestUtils.getParam
+import fi.johannes.utils.RequestUtils.getParam
+import io.vertx.core.logging.Logger
+import io.vertx.ext.sql.SQLClient
+import io.vertx.ext.web.templ.TemplateEngine
 import java.util.*
 import java.util.stream.Collectors
 
@@ -28,9 +34,33 @@ class MainVerticle : AbstractVerticle() {
 
   private val EMPTY_PAGE_MARKDOWN = "# A new page\n\n Feel-free to write in Markdown!\n";
 
-  private val LOGGER = LoggerFactory.getLogger("MainVerticle")
-  private var dbClient: JDBCClient? = null // todo remove
-  private val templateEngine = FreeMarkerTemplateEngine.create()
+  private val logger: Logger  by lazy {
+    LoggerFactory.getLogger("MainVerticle")
+  }
+
+  private val dbClient: JDBCClient by lazy {
+    JDBCClient.createShared(vertx, JsonObject()
+      .put("url", "jdbc:hsqldb:file:db/wiki")
+      .put("driver_class", "org.hsqldb.jdbcDriver")
+      .put("max_pool_size", 30))
+  }
+  private val templateEngine by lazy {
+    FreeMarkerTemplateEngine.create()
+  }
+
+  val appModule = Kodein {
+    bind<SQLClient>() with singleton { dbClient }
+    bind<TemplateEngine>() with singleton { templateEngine }
+    bind<Logger>() with singleton { logger }
+  }
+  val handlerModule = HandlerModule(appModule)
+
+
+  private val wikiDbQueue = "wikidb.queue";
+
+  val CONFIG_HTTP_SERVER_PORT = "http.server.port";
+  val CONFIG_WIKIDB_QUEUE = "wikidb.queue";
+
 
   override fun start(startFuture: Future<Void>) {
     val steps = prepareDatabase().compose { v -> startHttpServer() }
@@ -45,15 +75,10 @@ class MainVerticle : AbstractVerticle() {
   private fun prepareDatabase(): Future<Void> {
     val future = Future.future<Void>()
 
-    val dbClient: JDBCClient = JDBCClient.createShared(vertx, JsonObject()
-      .put("url", "jdbc:hsqldb:file:db/wiki")
-      .put("driver_class", "org.hsqldb.jdbcDriver")
-      .put("max_pool_size", 30))
-
     dbClient.getConnection { ar ->
       when (ar.failed()) {
         true -> {
-          LOGGER.error("Could not open a database connection", ar.cause())
+          logger.error("Could not open a database connection", ar.cause())
           future.fail(ar.cause())
         }
         false -> {
@@ -61,7 +86,7 @@ class MainVerticle : AbstractVerticle() {
           connection.execute(SQL_CREATE_PAGES_TABLE, { create ->
             connection.close()
             if (create.failed()) {
-              LOGGER.error("Database preparation error", create.cause())
+              logger.error("Database preparation error", create.cause())
               future.fail(create.cause())
             } else {
               future.complete()
@@ -70,14 +95,42 @@ class MainVerticle : AbstractVerticle() {
         }
       }
     }
-
-    this.dbClient = dbClient
-
     return future
   }
 
-  private fun indexHandler(context: RoutingContext) {
-    dbClient?.getConnection { car ->
+  private fun startHttpServer(): Future<Void> {
+    val future = Future.future<Void>()
+
+    val router = Router.router(vertx);
+    val server = vertx.createHttpServer();
+
+    val index: Index = handlerModule.handlers.instance(); // todo could use string tags to even less coupling
+    router.get("/").handler(index::handler);
+    router.get("/wiki/:page").handler(this::pageRenderingHandler);
+
+    router.post().handler(BodyHandler.create());
+    router.post("/save").handler(this::pageUpdateHandler);
+    router.post("/create").handler(this::pageCreateHandler);
+    router.post("/delete").handler(this::pageDeletionHandler);
+
+    val portNumber = config().getInteger(CONFIG_HTTP_SERVER_PORT, 8080);
+
+    server
+      .requestHandler(router::accept)
+      .listen(portNumber, { ar ->
+        if (ar.succeeded()) {
+          logger.info("HTTP server running on port 8080");
+          future.complete();
+        } else {
+          logger.error("Could not start a HTTP server", ar.cause());
+          future.fail(ar.cause());
+        }
+      });
+    return future
+  }
+
+  private fun indexHandler(context: RoutingContext, dbClient: SQLClient) {
+    dbClient.getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result();
         connection.query(SQL_ALL_PAGES, { res ->
@@ -117,10 +170,10 @@ class MainVerticle : AbstractVerticle() {
   private fun pageRenderingHandler(context: RoutingContext) {
     val page = context.request().getParam("page");
 
-    dbClient?.getConnection{ car ->
+    dbClient.getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
-        connection.queryWithParams(SQL_GET_PAGE,  JsonArray().add(page), { fetch ->
+        connection.queryWithParams(SQL_GET_PAGE, JsonArray().add(page), { fetch ->
           connection.close()
           if (fetch.succeeded()) {
 
@@ -134,7 +187,7 @@ class MainVerticle : AbstractVerticle() {
 
             context.put("title", page)
               .put("id", id)
-              .put("newPage", if(fetch.result().getResults().size == 0) "yes" else "no")
+              .put("newPage", if (fetch.result().getResults().size == 0) "yes" else "no")
               .put("rawContent", rawContent)
               .put("content", Processor.process(rawContent))
               .put("timestamp", Date().toString())
@@ -146,33 +199,35 @@ class MainVerticle : AbstractVerticle() {
                 context.fail(ar.cause());
               }
             })
-          }
-          else {
+          } else {
             context.fail(fetch.cause());
           }
         })
-      }
-      else {
+      } else {
         context.fail(car.cause());
 
       }
     }
   }
+
   private fun pageUpdateHandler(context: RoutingContext) {
     val request = context.request()
 
     val id = getParam(name = "id", request = request)
     val title = getParam(name = "title", request = request)
     val markdown = getParam(name = "markdown", request = request)
-    val newPage = "yes" == getParam(name= "newPage", request = request)
+    val newPage = "yes" == getParam(name = "newPage", request = request)
 
-    dbClient?.getConnection { car ->
+    dbClient.getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
-        val sql = if(newPage) SQL_CREATE_PAGE else SQL_SAVE_PAGE
+        val sql = if (newPage) SQL_CREATE_PAGE else SQL_SAVE_PAGE
         val params = JsonArray()
-        if (newPage) { params.add(title).add(markdown) }
-        else { params.add(markdown).add(id) }
+        if (newPage) {
+          params.add(title).add(markdown)
+        } else {
+          params.add(markdown).add(id)
+        }
 
         connection.updateWithParams(sql, params, { res ->
           connection.close();
@@ -182,8 +237,7 @@ class MainVerticle : AbstractVerticle() {
             context.fail(res.cause())
           }
         })
-      }
-      else {
+      } else {
         context.fail(car.cause());
       }
     }
@@ -193,7 +247,7 @@ class MainVerticle : AbstractVerticle() {
   private fun pageCreateHandler(context: RoutingContext) {
     val pageName = context.request().getParam("name");
 
-    val location = if(pageName == null || pageName.isEmpty()) "/" else "/wiki/" + pageName;
+    val location = if (pageName == null || pageName.isEmpty()) "/" else "/wiki/" + pageName;
 
     context.response()
       .setStatusCode(303)
@@ -206,7 +260,7 @@ class MainVerticle : AbstractVerticle() {
 
     val id = getParam(name = "id", request = request)
 
-    dbClient?.getConnection { car ->
+    dbClient.getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
         connection.updateWithParams(SQL_DELETE_PAGE, JsonArray().add(id), { res ->
@@ -222,33 +276,6 @@ class MainVerticle : AbstractVerticle() {
       }
     }
   }
-
-  private fun startHttpServer(): Future<Void> {
-    val future = Future.future<Void>()
-
-    val router = Router.router(vertx);
-    val server = vertx.createHttpServer();
-
-    router.get("/").handler(this::indexHandler);
-    router.get("/wiki/:page").handler(this::pageRenderingHandler);
-
-    router.post().handler(BodyHandler.create());
-    router.post("/save").handler(this::pageUpdateHandler);
-    router.post("/create").handler(this::pageCreateHandler);
-    router.post("/delete").handler(this::pageDeletionHandler);
-
-    server
-      .requestHandler(router::accept)
-      .listen(8080, { ar ->
-        if (ar.succeeded()) {
-          LOGGER.info("HTTP server running on port 8080");
-          future.complete();
-        } else {
-          LOGGER.error("Could not start a HTTP server", ar.cause());
-          future.fail(ar.cause());
-        }
-      });
-    return future
-  }
-
 }
+
+

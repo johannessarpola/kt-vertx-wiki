@@ -1,4 +1,4 @@
-package io.vertx.utils
+package fi.johannes.utils
 
 import io.vertx.core.http.HttpServerRequest
 
