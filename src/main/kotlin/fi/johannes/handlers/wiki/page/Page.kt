@@ -7,9 +7,24 @@ import io.vertx.ext.web.RoutingContext
  */
 interface Page {
 
+  /**
+   * Gets a single page using page's name
+   */
   fun get(context: RoutingContext)
-  fun save(context: RoutingContext) // PUT
+
+  /**
+   * Saves using id if updating otherwise creates new
+   */
+  fun save(context: RoutingContext)
+
+  /**
+   * Redirects to edit view which uses saving
+   */
   fun create(context: RoutingContext)
-  fun delete(context: RoutingContext) // DELETE
+
+  /**
+   * Deletes a page using id
+   */
+  fun delete(context: RoutingContext)
 
 }

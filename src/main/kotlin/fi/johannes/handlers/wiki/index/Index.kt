@@ -7,6 +7,9 @@ import io.vertx.ext.web.RoutingContext
  */
 interface Index {
 
+  /**
+   * Gets all pages and uses index.ftl
+   */
   fun get(context: RoutingContext)
 
 }
