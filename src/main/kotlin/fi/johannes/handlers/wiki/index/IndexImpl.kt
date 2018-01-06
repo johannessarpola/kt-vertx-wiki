@@ -1,10 +1,7 @@
-package fi.johannes.handlers.wiki.Index
+package fi.johannes.handlers.wiki.index
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.instance
 import io.vertx.ext.sql.SQLClient
 import io.vertx.ext.web.RoutingContext
-import io.vertx.ext.web.templ.FreeMarkerTemplateEngine
 import io.vertx.ext.web.templ.TemplateEngine
 import java.util.stream.Collectors
 
@@ -15,15 +12,15 @@ class IndexImpl (val dbClient: SQLClient, val templateEngine: TemplateEngine): I
 
   val SQL_ALL_PAGES = "select Name from Pages" // todo move
 
-  override fun handler(context: RoutingContext) {
-    dbClient.getConnection { car ->
-      if (car.succeeded()) {
-        val connection = car.result();
+  override fun get(context: RoutingContext) {
+    dbClient.getConnection { result ->
+      if (result.succeeded()) {
+        val connection = result.result();
         connection.query(SQL_ALL_PAGES, { res ->
           connection.close();
 
           if (res.succeeded()) {
-            // todo move to own endpóint and use as REST API
+
             val pages = res.result()
               .getResults()
               .stream()
@@ -48,7 +45,7 @@ class IndexImpl (val dbClient: SQLClient, val templateEngine: TemplateEngine): I
           }
         })
       } else {
-        context.fail(car.cause());
+        context.fail(result.cause());
       }
     }
   }

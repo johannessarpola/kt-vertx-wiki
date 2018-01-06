@@ -4,9 +4,9 @@
 
   <div class="col-md-12 mt-1">
     <div class="float-xs-right">
-      <form class="form-inline" action="/create" method="post">
+      <form class="form-inline" action="/wiki/create" method="post">
         <div class="form-group">
-          <input type="text" class="form-control" id="name" name="name" placeholder="New page name">
+          <input type="text" class="form-control" id="page" name="page" placeholder="New page name">
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
       </form>

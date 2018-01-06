@@ -1,4 +1,4 @@
-package fi.johannes.handlers.wiki.Index
+package fi.johannes.handlers.wiki.index
 
 import io.vertx.ext.web.RoutingContext
 
@@ -7,6 +7,6 @@ import io.vertx.ext.web.RoutingContext
  */
 interface Index {
 
-  fun handler(context: RoutingContext)
+  fun get(context: RoutingContext)
 
 }

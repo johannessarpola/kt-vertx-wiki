@@ -9,7 +9,7 @@ object RequestUtils {
 
   fun getParam (name: String, request: HttpServerRequest, default: String = ""): String {
     val p = request.getParam(name)
-    if(p.isNotEmpty()) return p
+    if(!p.isNullOrEmpty()) return p
     else if(default.isNotEmpty()) return default
     else throw NoSuchFieldError()
   }
