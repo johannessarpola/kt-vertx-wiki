@@ -1,14 +1,12 @@
 package fi.johannes.starter;
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.bind
-import com.github.salomonbrys.kodein.instance
-import com.github.salomonbrys.kodein.singleton
-import fi.johannes.handlers.HandlerModule
+import com.github.salomonbrys.kodein.*
+import fi.johannes.handlers.wiki.WikiHandlers
 import fi.johannes.handlers.wiki.index.Index
 import fi.johannes.handlers.wiki.page.Page
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
+import io.vertx.core.eventbus.EventBus
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.Logger
 import io.vertx.core.logging.LoggerFactory
@@ -21,13 +19,6 @@ import io.vertx.ext.web.templ.TemplateEngine
 
 class MainVerticle : AbstractVerticle() {
   private val SQL_CREATE_PAGES_TABLE = "create table if not exists Pages (Id integer identity primary key, Name varchar(255) unique, Content clob)"
-  private val SQL_GET_PAGE = "select Id, Content from Pages where Name = ?"
-  private val SQL_CREATE_PAGE = "insert into Pages values (NULL, ?, ?)"
-  private val SQL_SAVE_PAGE = "save Pages set Content = ? where Id = ?"
-  private val SQL_ALL_PAGES = "select Name from Pages"
-  private val SQL_DELETE_PAGE = "delete from Pages where Id = ?"
-
-  private val EMPTY_PAGE_MARKDOWN = "# A new page\n\n Feel-free to write in Markdown!\n";
 
   private val logger: Logger  by lazy {
     LoggerFactory.getLogger("MainVerticle")
@@ -39,19 +30,28 @@ class MainVerticle : AbstractVerticle() {
       .put("driver_class", "org.hsqldb.jdbcDriver")
       .put("max_pool_size", 30))
   }
+
   private val templateEngine by lazy {
     FreeMarkerTemplateEngine.create()
   }
+
+  private val eventBus by lazy {
+    vertx.eventBus()
+  }
+
+  private val wikiDbQueue = "wikidb.queue";
 
   val appModule = Kodein {
     bind<SQLClient>() with singleton { dbClient }
     bind<TemplateEngine>() with singleton { templateEngine }
     bind<Logger>() with singleton { logger }
+    bind<EventBus>() with singleton { eventBus }
+    constant("wikiDatabaseQueue") with wikiDbQueue
   }
-  val handlerModule = HandlerModule(appModule)
+  val handlerModule = WikiHandlers(appModule)
 
 
-  private val wikiDbQueue = "wikidb.queue";
+
 
   val CONFIG_HTTP_SERVER_PORT = "http.server.port";
   val CONFIG_WIKIDB_QUEUE = "wikidb.queue";
@@ -96,10 +96,10 @@ class MainVerticle : AbstractVerticle() {
   private fun setupRouter(router:Router): Router {
 
     // todo could use string tags to even less coupling
-    val indexController = handlerModule.handlers.instance<Index>()
+    val indexController = handlerModule.injector.instance<Index>()
     router.get("/").handler(indexController::get);
 
-    val pageController = handlerModule.handlers.instance<Page>()
+    val pageController = handlerModule.injector.instance<Page>()
     router.get("/wiki/:page").handler(pageController::get)
     router.post().handler(BodyHandler.create())
     router.post("/wiki/create").handler(pageController::create)

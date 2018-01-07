@@ -1,18 +1,17 @@
 package fi.johannes.handlers.wiki.page
 
 import com.github.rjeschke.txtmark.Processor
-import fi.johannes.utils.RequestUtils
+import fi.johannes.handlers.wiki.WikiComponents
 import fi.johannes.utils.RequestUtils.getParam
 import io.vertx.core.json.JsonArray
-import io.vertx.ext.sql.SQLClient
 import io.vertx.ext.web.RoutingContext
-import io.vertx.ext.web.templ.TemplateEngine
 import java.util.*
 
 /**
  * Johannes on 6.1.2018.
  */
-class PageImpl(val dbClient: SQLClient, val templateEngine: TemplateEngine):Page {
+class PageImpl(val components: WikiComponents):Page {
+
   val SQL_GET_PAGE = "select Id, Content from Pages where Name = ?"
   val SQL_CREATE_PAGE = "insert into Pages values (NULL, ?, ?)"
   val SQL_SAVE_PAGE = "update Pages set Content = ? where Id = ?"
@@ -23,7 +22,7 @@ class PageImpl(val dbClient: SQLClient, val templateEngine: TemplateEngine):Page
   override fun get(context: RoutingContext) {
     val page = context.request().getParam("page");
 
-    dbClient.getConnection { car ->
+    components.dbClient().getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
         connection.queryWithParams(SQL_GET_PAGE, JsonArray().add(page), { fetch ->
@@ -45,7 +44,7 @@ class PageImpl(val dbClient: SQLClient, val templateEngine: TemplateEngine):Page
               .put("content", Processor.process(rawContent))
               .put("timestamp", Date().toString())
 
-            templateEngine.render(context, "templates", "/page.ftl", { ar ->
+            components.templateEngine().render(context, "templates", "/page.ftl", { ar ->
               if (ar.succeeded()) {
                 context.response().putHeader("Content-Type", "text/html").end(ar.result());
               } else {
@@ -71,7 +70,7 @@ class PageImpl(val dbClient: SQLClient, val templateEngine: TemplateEngine):Page
     val markdown = getParam(name = "markdown", request = request)
     val newPage = "yes" == getParam(name = "newPage", request = request)
 
-    dbClient.getConnection { car ->
+    components.dbClient().getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
         val sql = if (newPage) SQL_CREATE_PAGE else SQL_SAVE_PAGE
@@ -113,7 +112,7 @@ class PageImpl(val dbClient: SQLClient, val templateEngine: TemplateEngine):Page
 
     val id = getParam(name = "id", request = request)
 
-    dbClient.getConnection { car ->
+    components.dbClient().getConnection { car ->
       if (car.succeeded()) {
         val connection = car.result()
         connection.updateWithParams(SQL_DELETE_PAGE, JsonArray().add(id), { res ->
