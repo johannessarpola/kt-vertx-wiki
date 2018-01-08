@@ -10,9 +10,9 @@ import io.vertx.ext.web.templ.TemplateEngine
 /**
  * Johannes on 7.1.2018.
  */
-class WikiControllerComponetsImpl(val templateEngine: TemplateEngine,
-                                  val dbQueue: String,
-                                  val eventBus: EventBus): WikiControllerComponents {
+class WikiControllerComponentsImpl(val templateEngine: TemplateEngine,
+                                   val dbQueue: String,
+                                   val eventBus: EventBus): WikiControllerComponents {
   override fun <T> sendToDatabaseQueue(message: Any,
                                        options: DeliveryOptions,
                                        replyHandler: Handler<AsyncResult<Message<T>>>) {

@@ -18,7 +18,7 @@ import io.vertx.ext.web.templ.FreeMarkerTemplateEngine
 class WikiControllers(val dbQueue: String,
                       val eventBus: EventBus) {
   val injector = Kodein {
-    bind<WikiControllerComponents>() with singleton { WikiControllerComponetsImpl(
+    bind<WikiControllerComponents>() with singleton { WikiControllerComponentsImpl(
       FreeMarkerTemplateEngine.create(),
       dbQueue,
       eventBus)
