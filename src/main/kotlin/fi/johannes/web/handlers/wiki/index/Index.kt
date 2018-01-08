@@ -1,4 +1,4 @@
-package fi.johannes.handlers.wiki.index
+package fi.johannes.web.handlers.wiki.index
 
 import io.vertx.ext.web.RoutingContext
 

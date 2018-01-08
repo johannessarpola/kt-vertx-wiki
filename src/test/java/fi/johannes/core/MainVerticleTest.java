@@ -1,4 +1,4 @@
-package fi.johannes.starter;
+package fi.johannes.core;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
@@ -17,7 +17,7 @@ public class MainVerticleTest {
   @Before
   public void setUp(TestContext tc) {
     vertx = Vertx.vertx();
-    vertx.deployVerticle(MainVerticle.class.getName(), tc.asyncAssertSuccess());
+    vertx.deployVerticle(AppVerticle.class.getName(), tc.asyncAssertSuccess());
   }
 
   @After

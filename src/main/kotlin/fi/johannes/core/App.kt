@@ -1,9 +1,9 @@
 import io.vertx.core.Vertx
-import fi.johannes.starter.MainVerticle
+import fi.johannes.core.AppVerticle
 
 fun main(args: Array<String>) {
   val vertx = Vertx.vertx()
-  vertx.deployVerticle(MainVerticle()) { ar ->
+  vertx.deployVerticle(AppVerticle()) { ar ->
     if (ar.succeeded()) {
       println("Application started")
     } else {
