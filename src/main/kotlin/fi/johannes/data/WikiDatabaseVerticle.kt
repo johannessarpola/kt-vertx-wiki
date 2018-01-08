@@ -1,18 +1,16 @@
 package fi.johannes.data
 
 import com.github.salomonbrys.kodein.*
-import io.vertx.core.AbstractVerticle
-import io.vertx.core.Future
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.*
-import io.vertx.core.json.JsonObject
-import io.vertx.ext.jdbc.JDBCClient
-import io.vertx.core.eventbus.Message
-import io.vertx.core.logging.Logger
 import fi.johannes.data.enums.ErrorCodes
 import fi.johannes.data.enums.SqlQuery
+import io.vertx.core.AbstractVerticle
+import io.vertx.core.Future
+import io.vertx.core.eventbus.Message
+import io.vertx.core.json.JsonObject
+import io.vertx.core.logging.Logger
+import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.sql.SQLClient
+import java.util.*
 
 /**
  * Johannes on 8.1.2018.
