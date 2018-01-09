@@ -1,6 +1,5 @@
 package fi.johannes.data.ext
 
-import fi.johannes.data.WikiDatabaseService
 import fi.johannes.data.enums.SqlQuery
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
@@ -13,26 +12,26 @@ import io.vertx.ext.jdbc.JDBCClient
  */
 class WikiDatabaseServiceExtImpl(val dbClient: JDBCClient,
                                  val sqlQueries: HashMap<SqlQuery, String>,
-                                 val readyHandler: Handler<AsyncResult<WikiDatabaseService>>) : WikiDatabaseServiceExt {
+                                 val readyHandler: Handler<AsyncResult<WikiDatabaseServiceExt>>) : WikiDatabaseServiceExt {
 
   override fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    throw NotImplementedError()
   }
 
   override fun fetchPage(name: String, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    throw NotImplementedError()
   }
 
   override fun createPage(title: String, markdown: String, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    throw NotImplementedError()
   }
 
   override fun savePage(id: Int, markdown: String, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    throw NotImplementedError()
   }
 
   override fun deletePage(id: Int, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    throw NotImplementedError()
   }
 
 }

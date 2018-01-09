@@ -23,11 +23,6 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'idea'
 
-description = """"""
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 def vertxVersion = '3.5.0'
 def mainVerticleName = 'fi.johannes.core.AppVerticle'
 def watchForChange = 'src/**/*'
@@ -38,11 +33,12 @@ repositories {
 }
 
 dependencies {
-  compile group: 'io.vertx', name: 'vertx-core', version: '3.5.0'
-  compile group: 'io.vertx', name: 'vertx-web', version: '3.5.0'
-  compile group: 'io.vertx', name: 'vertx-web-templ-freemarker', version: '3.5.0'
-  compile group: 'io.vertx', name: 'vertx-service-proxy', version: '3.5.0'
-  compile group: 'io.vertx', name: 'vertx-codegen', version: '3.5.0'
+  kapt "io.vertx:vertx-codegen:$vertxVersion:processor"
+  compile group: 'io.vertx', name: 'vertx-core', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-web', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-web-templ-freemarker', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-codegen', version: vertxVersion
   compile group: 'com.github.rjeschke', name: 'txtmark', version: '0.13'
   compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: '3.5.0'
   compile group: 'com.github.salomonbrys.kodein', name: 'kodein', version: '4.1.0'
@@ -52,7 +48,6 @@ dependencies {
   compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
   testCompile group: 'junit', name: 'junit', version: '4.12'
   testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.5.0'
-  kapt "io.vertx:vertx-codegen:$vertxVersion:processor"
 }
 
 // At the moment for non-Android projects you need to explicitly

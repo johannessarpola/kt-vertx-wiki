@@ -7,7 +7,14 @@ import io.vertx.core.eventbus.Message
 import io.vertx.ext.sql.SQLClient
 import fi.johannes.data.enums.SqlQuery
 import fi.johannes.data.enums.ErrorCodes
+import fi.johannes.data.ext.WikiDatabaseServiceExt
+import fi.johannes.data.ext.WikiDatabaseServiceExtImpl
+import fi.johannes.data.ext.WikiDatabaseServiceExtVertxEBProxy
+import io.vertx.core.AsyncResult
+import io.vertx.core.Handler
+import io.vertx.core.Vertx
 import io.vertx.core.logging.Logger
+import io.vertx.ext.jdbc.JDBCClient
 
 
 /**
@@ -102,5 +109,4 @@ class WikiDatabaseServiceImpl(private val sqlQueries: Map<SqlQuery, String>,
     verticleLogging.error("Database query error", cause)
     message.fail(ErrorCodes.DB_ERROR.ordinal, cause.message)
   }
-
 }
