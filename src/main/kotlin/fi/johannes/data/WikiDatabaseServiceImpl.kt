@@ -15,7 +15,7 @@ import io.vertx.core.logging.Logger
  */
 class WikiDatabaseServiceImpl(private val sqlQueries: Map<SqlQuery, String>,
                               private val sqlClient: SQLClient,
-                              private val logging: Logger) : WikiDatabaseService {
+                              private val verticleLogging: Logger) : WikiDatabaseService {
 
   override fun fetchAllPages(message: Message<JsonObject>) {
     sqlClient.query(sqlQueries[SqlQuery.ALL_PAGES], { res ->
@@ -99,7 +99,7 @@ class WikiDatabaseServiceImpl(private val sqlQueries: Map<SqlQuery, String>,
   }
 
   private fun reportQueryError(message: Message<JsonObject>, cause: Throwable) {
-    logging.error("Database query error", cause)
+    verticleLogging.error("Database query error", cause)
     message.fail(ErrorCodes.DB_ERROR.ordinal, cause.message)
   }
 
