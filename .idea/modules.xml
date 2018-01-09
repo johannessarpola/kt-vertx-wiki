@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/vertx-start-project.iml" filepath="$PROJECT_DIR$/vertx-start-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vertx-start-project_main.iml" filepath="$PROJECT_DIR$/.idea/modules/vertx-start-project_main.iml" group="vertx-start-project" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vertx-start-project_test.iml" filepath="$PROJECT_DIR$/.idea/modules/vertx-start-project_test.iml" group="vertx-start-project" />
     </modules>
   </component>
 </project>

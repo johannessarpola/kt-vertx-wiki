@@ -11,6 +11,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="vertx-start-project" target="1.8" />
+      <module name="vertx-start-project_main" target="1.8" />
+      <module name="vertx-start-project_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

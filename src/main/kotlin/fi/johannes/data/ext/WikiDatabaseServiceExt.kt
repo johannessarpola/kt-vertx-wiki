@@ -15,6 +15,8 @@ import io.vertx.core.Vertx
 
 
 
+
+
 /**
  * Johannes on 9.1.2018.
  */
@@ -31,4 +33,7 @@ interface WikiDatabaseServiceExt {
   @Fluent
   fun deletePage(id: Int, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt
 
+  fun createProxy(vertx: Vertx, address: String): WikiDatabaseServiceExt {
+    return WikiDatabaseServiceExtVertxEBProxy(vertx, address)
+  }
 }
