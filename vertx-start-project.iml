@@ -6,6 +6,7 @@
         <option value="I:\Programming\Kotlin\kt-vertx-wiki/src/main/kotlin" />
         <option value="I:\Programming\Kotlin\kt-vertx-wiki/src/test/java" />
         <option value="I:\Programming\Kotlin\kt-vertx-wiki/src/test/kotlin" />
+        <option value="src/main/java" />
         <option value="src/main/kotlin" />
       </list>
     </option>
@@ -35,6 +36,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/kotlin" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/kapt" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -60,6 +62,9 @@
     <orderEntry type="library" name="Maven: io.vertx:vertx-bridge-common:3.5.0" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-web-templ-freemarker:3.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.23" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-service-proxy:3.5.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.vertx:vertx-codegen:3.5.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.mvel:mvel2:2.3.1.Final" level="project" />
     <orderEntry type="library" name="Maven: com.github.rjeschke:txtmark:0.13" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-lang-kotlin-coroutines:3.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.51" level="project" />
