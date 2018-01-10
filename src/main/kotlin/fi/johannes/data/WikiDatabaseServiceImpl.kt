@@ -1,108 +1,98 @@
 package fi.johannes.data
 
+import fi.johannes.data.dao.PageDao
+import fi.johannes.data.enums.ErrorCodes
+import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import java.util.stream.Collectors
-import io.vertx.core.eventbus.Message
-import io.vertx.ext.sql.SQLClient
-import fi.johannes.data.enums.SqlQuery
-import fi.johannes.data.enums.ErrorCodes
-import fi.johannes.data.ext.WikiDatabaseServiceExt
-import fi.johannes.data.ext.WikiDatabaseServiceExtImpl
-import fi.johannes.data.ext.WikiDatabaseServiceExtVertxEBProxy
-import io.vertx.core.AsyncResult
-import io.vertx.core.Handler
-import io.vertx.core.Vertx
 import io.vertx.core.logging.Logger
-import io.vertx.ext.jdbc.JDBCClient
+import java.util.stream.Collectors
 
 
 /**
  * Johannes on 8.1.2018.
  */
-class WikiDatabaseServiceImpl(private val sqlQueries: Map<SqlQuery, String>,
-                              private val sqlClient: SQLClient,
+class WikiDatabaseServiceImpl(private val pageDao: PageDao,
                               private val verticleLogging: Logger) : WikiDatabaseService {
 
   override fun fetchAllPages(message: Message<JsonObject>) {
-    sqlClient.query(sqlQueries[SqlQuery.ALL_PAGES], { res ->
-      if (res.succeeded()) {
-        val pages = res.result()
+    pageDao.fetchAllPages(
+      success = { result ->
+        val pages = result
           .getResults()
           .stream()
           .map({ json -> json.getString(0) })
           .sorted()
           .collect(Collectors.toList())
         message.reply(JsonObject().put("pages", JsonArray(pages)))
-      } else {
-        reportQueryError(message, res.cause())
-      }
-    })
+      },
+      error = { error ->
+        reportQueryError(message, error)
+      })
   }
 
   override fun fetchPage(message: Message<JsonObject>) {
     val requestedPage = message.body().getString("page")
     val params = JsonArray().add(requestedPage)
 
-    sqlClient.queryWithParams(sqlQueries[SqlQuery.GET_PAGE], params, { fetch ->
-      if (fetch.succeeded()) {
+    pageDao.fetchPage(params,
+      success = { result ->
         val response = JsonObject()
-        val resultSet = fetch.result()
-        if (resultSet.getNumRows() == 0) {
+        if (result.getNumRows() == 0) {
           response.put("found", false)
         } else {
           response.put("found", true)
-          val row = resultSet.getResults().get(0)
+          val row = result.getResults().get(0)
           response.put("id", row.getInteger(0))
-          response.put("rawContent", row.getString(1))
+            .put("rawContent", row.getString(1))
         }
         message.reply(response)
-      } else {
-        reportQueryError(message, fetch.cause())
-      }
-    })
+      },
+      error = { error ->
+        reportQueryError(message, error)
+      })
   }
 
   override fun createPage(message: Message<JsonObject>) {
     val request = message.body()
-    val data = JsonArray()
+    val params = JsonArray()
       .add(request.getString("title"))
       .add(request.getString("markdown"))
 
-    sqlClient.updateWithParams(sqlQueries.get(SqlQuery.CREATE_PAGE), data, { res ->
-      if (res.succeeded()) {
+    pageDao.insertPage(params,
+      success = { ->
         message.reply("ok")
-      } else {
-        reportQueryError(message, res.cause())
-      }
-    })
+      },
+      error = { error ->
+        reportQueryError(message, error)
+      })
   }
 
   override fun savePage(message: Message<JsonObject>) {
     val request = message.body()
-    val data = JsonArray()
+    val params = JsonArray()
       .add(request.getString("markdown"))
       .add(request.getString("id"))
 
-    sqlClient.updateWithParams(sqlQueries[SqlQuery.SAVE_PAGE], data, { res ->
-      if (res.succeeded()) {
+    pageDao.insertPage(params,
+      success = { ->
         message.reply("ok")
-      } else {
-        reportQueryError(message, res.cause())
-      }
-    })
+      },
+      error = { error ->
+        reportQueryError(message, error)
+      })
   }
 
   override fun deletePage(message: Message<JsonObject>) {
-    val data = JsonArray().add(message.body().getString("id"))
+    val params = JsonArray().add(message.body().getString("id"))
 
-    sqlClient.updateWithParams(sqlQueries[SqlQuery.DELETE_PAGE], data, { res ->
-      if (res.succeeded()) {
+    pageDao.deletePage(params,
+      success = { ->
         message.reply("ok")
-      } else {
-        reportQueryError(message, res.cause())
-      }
-    })
+      },
+      error = { error ->
+        reportQueryError(message, error)
+      })
   }
 
   private fun reportQueryError(message: Message<JsonObject>, cause: Throwable) {

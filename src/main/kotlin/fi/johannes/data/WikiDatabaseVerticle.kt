@@ -1,6 +1,8 @@
 package fi.johannes.data
 
 import com.github.salomonbrys.kodein.*
+import fi.johannes.data.dao.PageDao
+import fi.johannes.data.dao.PageDaoImpl
 import fi.johannes.data.enums.ErrorCodes
 import fi.johannes.data.enums.SqlQuery
 import io.vertx.core.AbstractVerticle
@@ -44,8 +46,11 @@ class WikiDatabaseVerticle : AbstractVerticle() {
       bind<SQLClient>() with singleton { dbClient }
       bind<Logger>() with singleton { logger }
       constant("sqlQueries") with sqlQueries
+      bind<PageDao>() with singleton {
+        PageDaoImpl(instance(), instance("sqlQueries"))
+      }
       bind<WikiDatabaseService>() with singleton {
-        WikiDatabaseServiceImpl(instance("sqlQueries"), instance(), instance())
+        WikiDatabaseServiceImpl(instance(), instance())
       }
     }
   }
