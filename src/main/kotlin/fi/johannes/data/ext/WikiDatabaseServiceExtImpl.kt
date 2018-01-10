@@ -1,37 +1,129 @@
 package fi.johannes.data.ext
 
-import fi.johannes.data.enums.SqlQuery
+import fi.johannes.data.dao.PageDao
 import io.vertx.core.AsyncResult
+import io.vertx.core.Future
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.jdbc.JDBCClient
+import io.vertx.core.logging.LoggerFactory
+import java.util.stream.Collectors
+
 
 /**
  * Johannes on 9.1.2018.
  */
-class WikiDatabaseServiceExtImpl(val dbClient: JDBCClient,
-                                 val sqlQueries: HashMap<SqlQuery, String>,
+class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
                                  val readyHandler: Handler<AsyncResult<WikiDatabaseServiceExt>>) : WikiDatabaseServiceExt {
 
+  private val LOGGER = LoggerFactory.getLogger(WikiDatabaseServiceExtImpl::class.java)
+
+  init {
+    pageDao.createTable(
+      success = { ->
+        readyHandler.handle(Future.succeededFuture(this))
+      },
+      connectionError = { err ->
+        LOGGER.error("Could not open a database connection", err)
+        readyHandler.handle(Future.failedFuture(err))
+      },
+      createError = { err ->
+        LOGGER.error("Database preparation error", err)
+        readyHandler.handle(Future.failedFuture(err))
+      })
+  }
+
   override fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {
-    throw NotImplementedError()
+    pageDao.fetchAllPages(
+      success = { result ->
+        val pages = result
+          .getResults()
+          .stream()
+          .map({ json -> json.getString(0) })
+          .sorted()
+          .collect(Collectors.toList())
+        resultHandler.handle(Future.succeededFuture(JsonArray(pages)))
+      },
+      error = { error ->
+        LOGGER.error("Database query error", error)
+        resultHandler.handle(Future.failedFuture(error))
+      })
+    return this
   }
 
   override fun fetchPage(name: String, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt {
-    throw NotImplementedError()
+    val params = JsonArray().add(name)
+
+    pageDao.fetchPage(params,
+      success = { result ->
+        val response = JsonObject()
+        if (result.getNumRows() == 0) {
+          response.put("found", false)
+        } else {
+          response.put("found", true)
+          val row = result.getResults().get(0)
+          response.put("id", row.getInteger(0))
+            .put("rawContent", row.getString(1))
+        }
+        resultHandler.handle(Future.succeededFuture(response))
+      },
+      error = { error ->
+        LOGGER.error("Database query error", error)
+        resultHandler.handle(Future.failedFuture(error))
+      })
+
+    return this
+  }
+
+  private fun daoFail(msg: String = "Database query error",
+                   error: Throwable,
+                   handler: Handler<AsyncResult<Void>>) {
+    LOGGER.error(msg, error)
+    handler.handle(Future.failedFuture(error))
+  }
+
+  private fun blankSuccess(handler: Handler<AsyncResult<Void>>) {
+    handler.handle(Future.succeededFuture())
   }
 
   override fun createPage(title: String, markdown: String, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    throw NotImplementedError()
+    val params = JsonArray().add(title).add(markdown)
+
+    pageDao.insertPage(params,
+      success = { ->
+        blankSuccess(resultHandler)
+      },
+      error = { error ->
+        daoFail(error = error, handler = resultHandler)
+      })
+    return this
   }
 
   override fun savePage(id: Int, markdown: String, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    throw NotImplementedError()
+    val params = JsonArray().add(markdown).add(id)
+
+    pageDao.insertPage(params,
+      success = { ->
+        blankSuccess(resultHandler)
+      },
+      error = { error ->
+        daoFail(error = error, handler = resultHandler)
+      })
+
+    return this
   }
 
   override fun deletePage(id: Int, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
-    throw NotImplementedError()
+    val params = JsonArray().add(id)
+
+    pageDao.deletePage(params,
+      success = { ->
+        blankSuccess(resultHandler)
+      },
+      error = { error ->
+        daoFail(error = error, handler = resultHandler)
+      })
+    return this
   }
 
 }
