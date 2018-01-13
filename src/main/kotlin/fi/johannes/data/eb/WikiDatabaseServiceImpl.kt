@@ -1,4 +1,4 @@
-package fi.johannes.data
+package fi.johannes.data.eb
 
 import fi.johannes.data.dao.PageDao
 import fi.johannes.data.enums.ErrorCodes

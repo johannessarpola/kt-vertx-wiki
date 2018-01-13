@@ -1,4 +1,4 @@
-package fi.johannes.data
+package fi.johannes.data.eb
 
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
