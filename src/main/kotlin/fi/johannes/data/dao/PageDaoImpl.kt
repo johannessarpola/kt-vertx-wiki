@@ -24,12 +24,14 @@ class PageDaoImpl(val sqlClient: SQLClient,
       if (ar.failed()) {
         connectionError(ar.cause())
       } else {
+        logger.info("Established page database connection successfully")
         val connection = ar.result()
         connection.execute(sqlQueries[SqlQuery.CREATE_PAGES_TABLE]) { create ->
           connection.close()
           if (create.failed()) {
             createError(create.cause())
           } else {
+            logger.info("Initialized page database successfully")
             success()
           }
         }

@@ -31,6 +31,7 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
         LOGGER.error("Database preparation error", err)
         readyHandler.handle(Future.failedFuture(err))
       })
+
   }
 
   override fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {

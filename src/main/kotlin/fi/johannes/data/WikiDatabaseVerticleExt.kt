@@ -25,7 +25,7 @@ import io.vertx.core.eventbus.MessageConsumer
 /**
  * Johannes on 8.1.2018.
  */
-class WikiDatabaseVerticle : AbstractVerticle() {
+class WikiDatabaseVerticleExt : AbstractVerticle() {
 
   val CONFIG_WIKIDB_JDBC_URL = "wikidb.jdbc.url";
   val CONFIG_WIKIDB_JDBC_DRIVER_CLASS = "wikidb.jdbc.driver_class";
@@ -48,10 +48,6 @@ class WikiDatabaseVerticle : AbstractVerticle() {
     loadQueries()
   }
 
-  private val actions: Map<String, (Message<JsonObject>) -> Unit> by lazy {
-    mapActions()
-  }
-
 
   private val modules by lazy {
     Kodein {
@@ -64,25 +60,19 @@ class WikiDatabaseVerticle : AbstractVerticle() {
   }
 
   override fun start(startFuture: Future<Void>) {
-    dbClient.getConnection({ ar ->
-      if (ar.failed()) {
-        logger.error("Could not open a database connection", ar.cause());
-        startFuture.fail(ar.cause());
+    logger.info("Starting WikiDatabaseVerticleExt")
+    val now = System.currentTimeMillis()
+    WikiDatabaseServiceExtFactory.createService(modules.instance(), Handler { ready ->
+      if(ready.succeeded()) {
+        ServiceBinder(vertx)
+          .setAddress(CONFIG_WIKIDB_QUEUE)
+          .register(WikiDatabaseServiceExt::class.java, ready.result())
+        logger.info("WikiDatabaseVerticleExt start successful in ${System.currentTimeMillis() - now} ms")
+        startFuture.complete()
       } else {
-        val connection = ar.result();
-        connection.execute(sqlQueries[SqlQuery.CREATE_PAGES_TABLE], { create ->
-          connection.close();
-          if (create.failed()) {
-            logger.error("Database preparation error", create.cause());
-            startFuture.fail(create.cause());
-          } else {
-            vertx.eventBus().consumer(config().getString(CONFIG_WIKIDB_QUEUE, "wikidb.queue"), this::onMessage);
-            startFuture.complete();
-          }
-        });
+        startFuture.fail(ready.cause());
       }
-    });
-
+    })
   }
 
   private fun loadQueries(): Map<SqlQuery, String> {
@@ -95,17 +85,6 @@ class WikiDatabaseVerticle : AbstractVerticle() {
     return mapQueries(queriesProps)
   }
 
-  private fun mapActions(): Map<String, (Message<JsonObject>) -> Unit> {
-    val service: WikiDatabaseService = modules.instance()
-    return mapOf(
-      "all-pages" to { message -> service.fetchAllPages(message) },
-      "get-page" to { message -> service.fetchPage(message) },
-      "create-page" to { message -> service.createPage(message) },
-      "save-page" to { message -> service.savePage(message) },
-      "delete-page" to { message -> service.deletePage(message) }
-    )
-  }
-
   private fun mapQueries(props: Properties): Map<SqlQuery, String> {
     return mapOf(
       SqlQuery.CREATE_PAGES_TABLE to props.getProperty("create-pages-table"),
@@ -115,30 +94,6 @@ class WikiDatabaseVerticle : AbstractVerticle() {
       SqlQuery.SAVE_PAGE to props.getProperty("save-page"),
       SqlQuery.DELETE_PAGE to props.getProperty("delete-page")
     )
-  }
-
-  fun onMessage(message: Message<JsonObject>) {
-    ifActionPresent(message, { m -> doAction(m) })
-  }
-
-  private fun doAction(message: Message<JsonObject>): Unit {
-    val action = message.headers().get("action")
-    if (actions.containsKey(action)) {
-      val f = actions[action]?.invoke(message)
-    }
-    else {
-      message.fail(ErrorCodes.BAD_ACTION.ordinal, "Bad action: "+action)
-    }
-  }
-
-  private fun ifActionPresent(message: Message<JsonObject>, block: (Message<JsonObject>) -> Unit) {
-    if (!message.headers().contains("action")) {
-      logger.error("No action header specified for message with headers {} and body {}",
-        message.headers(), message.body().encodePrettily())
-      message.fail(ErrorCodes.NO_ACTION_SPECIFIED.ordinal, "No action header specified")
-    } else {
-      block(message)
-    }
   }
 }
 

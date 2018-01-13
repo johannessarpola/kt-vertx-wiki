@@ -2,10 +2,12 @@ package fi.johannes.data
 
 import fi.johannes.data.dao.PageDao
 import fi.johannes.data.enums.ErrorCodes
+import fi.johannes.data.ext.WikiDatabaseServiceExtImpl
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.Logger
+import io.vertx.core.logging.LoggerFactory
 import java.util.stream.Collectors
 
 
@@ -14,6 +16,8 @@ import java.util.stream.Collectors
  */
 class WikiDatabaseServiceImpl(private val pageDao: PageDao,
                               private val verticleLogging: Logger) : WikiDatabaseService {
+
+  private val LOGGER = LoggerFactory.getLogger(WikiDatabaseServiceExtImpl::class.java)
 
   override fun fetchAllPages(message: Message<JsonObject>) {
     pageDao.fetchAllPages(
@@ -96,7 +100,7 @@ class WikiDatabaseServiceImpl(private val pageDao: PageDao,
   }
 
   private fun reportQueryError(message: Message<JsonObject>, cause: Throwable) {
-    verticleLogging.error("Database query error", cause)
+    LOGGER.error("Database query error", cause)
     message.fail(ErrorCodes.DB_ERROR.ordinal, cause.message)
   }
 }

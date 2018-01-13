@@ -11,7 +11,7 @@ import io.vertx.ext.jdbc.JDBCClient
  * Johannes on 9.1.2018.
  */
 object WikiDatabaseServiceExtFactory {
-  fun create(pageDao: PageDao, readyHandler: Handler<AsyncResult<WikiDatabaseServiceExt>>): WikiDatabaseServiceExt {
+  fun createService(pageDao: PageDao, readyHandler: Handler<AsyncResult<WikiDatabaseServiceExt>>): WikiDatabaseServiceExt {
     return WikiDatabaseServiceExtImpl(pageDao, readyHandler)
   }
 
