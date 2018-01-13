@@ -4,6 +4,7 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.singleton
 import fi.johannes.data.WikiDatabaseVerticle
+import fi.johannes.data.WikiDatabaseVerticleExt
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Future
@@ -23,12 +24,12 @@ class AppVerticle : AbstractVerticle() {
   override fun start(startFuture: Future<Void>) {
 
     val databaseDeployment = Future.future<String>()
-    vertx.deployVerticle(WikiDatabaseVerticle(), databaseDeployment.completer());
+    vertx.deployVerticle(WikiDatabaseVerticleExt(), databaseDeployment.completer());
 
     databaseDeployment.compose { id ->
       val httpDeployment: Future<String> = Future.future<String>();
       vertx.deployVerticle(
-        "fi.johannes.web.HttpServerVerticle",
+        "fi.johannes.web.HttpServerVerticleExt",
         DeploymentOptions().setInstances(2),
         httpDeployment.completer());
 
