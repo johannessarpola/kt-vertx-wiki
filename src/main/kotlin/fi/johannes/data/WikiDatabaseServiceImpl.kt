@@ -78,7 +78,7 @@ class WikiDatabaseServiceImpl(private val pageDao: PageDao,
       .add(request.getString("markdown"))
       .add(request.getString("id"))
 
-    pageDao.insertPage(params,
+    pageDao.updatePage(params,
       success = { ->
         message.reply("ok")
       },

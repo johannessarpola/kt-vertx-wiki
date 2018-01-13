@@ -45,23 +45,23 @@ class WikiDatabaseServiceImplTest {
   @Test
   fun testCrud(context: TestContext) {
     val async = context.async()
-
+    context.assertNotNull(service)
     service?.createPage("Test", "Some content", context.asyncAssertSuccess { v1 ->
 
-      service?.fetchPage("Test", context.asyncAssertSuccess { json1 ->
-        context.assertTrue(json1.getBoolean("found"))
-        context.assertTrue(json1.containsKey("id"))
-        context.assertEquals("Some content", json1.getString("rawContent"))
+      service?.fetchPage("Test", context.asyncAssertSuccess { pageJson ->
+        context.assertTrue(pageJson.getBoolean("found"))
+        context.assertTrue(pageJson.containsKey("id"))
+        context.assertEquals("Some content", pageJson.getString("rawContent"))
 
-        service?.savePage(json1.getInteger("id"), "Yo!", context.asyncAssertSuccess { v2 ->
+        service?.savePage(pageJson.getInteger("id"), "Yo!", context.asyncAssertSuccess { v2 ->
 
           service?.fetchAllPages(context.asyncAssertSuccess { array1 ->
             context.assertEquals(1, array1.size())
 
-            service?.fetchPage("Test", context.asyncAssertSuccess { json2 ->
-              context.assertEquals("Yo!", json2.getString("rawContent"))
+            service?.fetchPage("Test", context.asyncAssertSuccess { updatedPageJson ->
+              context.assertEquals("Yo!", updatedPageJson.getString("rawContent"))
 
-              service?.deletePage(json1.getInteger("id"), Handler { v3 ->
+              service?.deletePage(pageJson.getInteger("id"), Handler { v3 ->
 
                 service?.fetchAllPages(context.asyncAssertSuccess(Handler { array2 ->
                   context.assertTrue(array2.isEmpty)
