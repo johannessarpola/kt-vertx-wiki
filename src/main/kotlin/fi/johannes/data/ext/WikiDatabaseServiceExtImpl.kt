@@ -103,7 +103,7 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
   override fun savePage(id: Int, markdown: String, resultHandler: Handler<AsyncResult<Void>>): WikiDatabaseServiceExt {
     val params = JsonArray().add(markdown).add(id)
 
-    pageDao.insertPage(params,
+    pageDao.updatePage(params,
       success = { ->
         blankSuccess(resultHandler)
       },

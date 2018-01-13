@@ -24,9 +24,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'idea'
 
 def vertxVersion = '3.5.0'
-def mainVerticleName = 'fi.johannes.core.AppVerticle'
-def watchForChange = 'src/**/*'
-def doOnChange = './gradlew classes'
 
 repositories {
   jcenter()
@@ -39,15 +36,15 @@ dependencies {
   compile group: 'io.vertx', name: 'vertx-web-templ-freemarker', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-codegen', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-jdbc-client', version: vertxVersion
+  testCompile group: 'io.vertx', name: 'vertx-unit', version: vertxVersion
   compile group: 'com.github.rjeschke', name: 'txtmark', version: '0.13'
-  compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: '3.5.0'
   compile group: 'com.github.salomonbrys.kodein', name: 'kodein', version: '4.1.0'
-  compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.5.0'
   compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.4'
   compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.2.10'
   compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
   testCompile group: 'junit', name: 'junit', version: '4.12'
-  testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.5.0'
 }
 
 // At the moment for non-Android projects you need to explicitly

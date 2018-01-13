@@ -27,11 +27,13 @@ import io.vertx.core.eventbus.MessageConsumer
  */
 class WikiDatabaseVerticleExt : AbstractVerticle() {
 
-  val CONFIG_WIKIDB_JDBC_URL = "wikidb.jdbc.url";
-  val CONFIG_WIKIDB_JDBC_DRIVER_CLASS = "wikidb.jdbc.driver_class";
-  val CONFIG_WIKIDB_JDBC_MAX_POOL_SIZE = "wikidb.jdbc.max_pool_size";
-  val CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "wikidb.sqlqueries.resource.file";
-  val CONFIG_WIKIDB_QUEUE = "wikidb.queue";
+  companion object {
+    val CONFIG_WIKIDB_JDBC_URL = "wikidb.jdbc.url";
+    val CONFIG_WIKIDB_JDBC_DRIVER_CLASS = "wikidb.jdbc.driver_class";
+    val CONFIG_WIKIDB_JDBC_MAX_POOL_SIZE = "wikidb.jdbc.max_pool_size";
+    val CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "wikidb.sqlqueries.resource.file";
+    val CONFIG_WIKIDB_QUEUE = "wikidb.queue";
+  }
 
   private val logger: Logger  by lazy {
     io.vertx.core.logging.LoggerFactory.getLogger("WikiDatabaseVerticle")
