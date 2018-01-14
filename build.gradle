@@ -36,8 +36,10 @@ dependencies {
   compile group: 'io.vertx', name: 'vertx-web-templ-freemarker', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-codegen', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-lang-kotlin', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-jdbc-client', version: vertxVersion
+  compile group: 'io.vertx', name: 'vertx-web-client', version: vertxVersion
   testCompile group: 'io.vertx', name: 'vertx-unit', version: vertxVersion
   compile group: 'com.github.rjeschke', name: 'txtmark', version: '0.13'
   compile group: 'com.github.salomonbrys.kodein', name: 'kodein', version: '4.1.0'

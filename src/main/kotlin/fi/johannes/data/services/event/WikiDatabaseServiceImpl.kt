@@ -1,8 +1,8 @@
-package fi.johannes.data.eb
+package fi.johannes.data.services.event
 
 import fi.johannes.data.dao.PageDao
 import fi.johannes.data.enums.ErrorCodes
-import fi.johannes.data.ext.WikiDatabaseServiceExtImpl
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExtImpl
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject

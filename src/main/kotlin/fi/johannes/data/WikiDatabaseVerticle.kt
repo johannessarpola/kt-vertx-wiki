@@ -3,7 +3,7 @@ package fi.johannes.data
 import com.github.salomonbrys.kodein.*
 import fi.johannes.data.dao.PageDao
 import fi.johannes.data.dao.PageDaoImpl
-import fi.johannes.data.eb.WikiDatabaseService
+import fi.johannes.data.services.event.WikiDatabaseService
 import fi.johannes.data.enums.ErrorCodes
 import fi.johannes.data.enums.SqlQuery
 import io.vertx.core.AbstractVerticle

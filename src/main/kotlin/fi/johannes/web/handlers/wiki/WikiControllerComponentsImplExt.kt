@@ -1,11 +1,6 @@
 package fi.johannes.web.handlers.wiki
 
-import fi.johannes.data.ext.WikiDatabaseServiceExt
-import io.vertx.core.AsyncResult
-import io.vertx.core.Handler
-import io.vertx.core.eventbus.DeliveryOptions
-import io.vertx.core.eventbus.EventBus
-import io.vertx.core.eventbus.Message
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
 import io.vertx.ext.web.templ.TemplateEngine
 
 /**

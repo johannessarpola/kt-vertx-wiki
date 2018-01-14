@@ -3,23 +3,18 @@ package fi.johannes.data
 import com.github.salomonbrys.kodein.*
 import fi.johannes.data.dao.PageDao
 import fi.johannes.data.dao.PageDaoImpl
-import fi.johannes.data.enums.ErrorCodes
 import fi.johannes.data.enums.SqlQuery
-import fi.johannes.data.ext.WikiDatabaseServiceExt
-import fi.johannes.data.ext.WikiDatabaseServiceExtFactory
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExtFactory
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.Handler
-import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.Logger
 import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.sql.SQLClient
-import io.vertx.serviceproxy.ProxyHelper
 import io.vertx.serviceproxy.ServiceBinder
 import java.util.*
-import io.vertx.core.eventbus.MessageConsumer
-
 
 
 /**

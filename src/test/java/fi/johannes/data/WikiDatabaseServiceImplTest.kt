@@ -1,8 +1,7 @@
 package fi.johannes.data
 
-import fi.johannes.data.ext.WikiDatabaseServiceExt
-import fi.johannes.data.ext.WikiDatabaseServiceExtFactory
-import fi.johannes.data.ext.WikiDatabaseServiceExtImpl
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExtFactory
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
@@ -12,11 +11,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import org.junit.Assert.*
-import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
 import io.vertx.core.Handler
 import org.junit.After
-import io.vertx.core.impl.VertxImpl.context
 
 
 /**

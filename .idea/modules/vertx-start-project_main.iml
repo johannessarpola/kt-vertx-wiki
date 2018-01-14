@@ -43,8 +43,11 @@
     <orderEntry type="library" name="Gradle: io.vertx:vertx-web-templ-freemarker:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-web:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-service-proxy:3.5.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.vertx:vertx-lang-kotlin:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-lang-kotlin-coroutines:3.5.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.vertx:vertx-web-client:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-auth-common:3.5.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.vertx:vertx-web-common:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-core:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-codegen:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-jdbc-client:3.5.0" level="project" />

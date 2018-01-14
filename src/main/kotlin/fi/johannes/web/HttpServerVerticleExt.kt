@@ -1,8 +1,8 @@
 package fi.johannes.web
 
 import com.github.salomonbrys.kodein.*
-import fi.johannes.data.ext.WikiDatabaseServiceExt
-import fi.johannes.data.ext.WikiDatabaseServiceExtFactory
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
+import fi.johannes.data.services.proxy.WikiDatabaseServiceExtFactory
 import fi.johannes.web.handlers.wiki.WikiControllersExt
 import fi.johannes.web.handlers.wiki.index.Index
 import fi.johannes.web.handlers.wiki.page.Page
