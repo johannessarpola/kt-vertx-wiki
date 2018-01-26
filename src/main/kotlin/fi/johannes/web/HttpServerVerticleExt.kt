@@ -60,21 +60,35 @@ class HttpServerVerticleExt : AbstractVerticle() {
       });
   }
 
-  private fun setupRouter(router: Router): Router {
-
-    val controllers = WikiControllersExt(modules.instance())
-
+  private fun wikiRouter(): Router {
+    val router = Router.router(vertx)
+    val wikiControllers = WikiControllersExt(modules.instance())
     // todo could use string tags to even less coupling
-    val indexController = controllers.injector.instance<Index>()
-    router.get("/").handler(indexController::get);
+    val pageController = wikiControllers.injector.instance<Page>()
 
-    // todo could use string tags to even less coupling
-    val pageController = controllers.injector.instance<Page>()
-    router.get("/wiki/:page").handler(pageController::get)
+    router.get("/:page").handler(pageController::get)
     router.post().handler(BodyHandler.create())
-    router.post("/wiki/create").handler(pageController::create)
-    router.post("/wiki/:id/save").handler(pageController::save)
-    router.post("/wiki/:id/delete").handler(pageController::delete)
+    router.post("/create").handler(pageController::create)
+    router.post("/:id/save").handler(pageController::save)
+    router.post("/:id/delete").handler(pageController::delete)
+
+    return router
+  }
+
+  private fun indexRouter(): Router {
+    val router = Router.router(vertx)
+    val wikiControllers = WikiControllersExt(modules.instance())
+    // todo could use string tags to even less coupling
+    val indexController = wikiControllers.injector.instance<Index>()
+
+    router.get("/").handler(indexController::get)
+
+    return router
+  }
+
+  private fun setupRouter(router: Router): Router {
+    router.mountSubRouter("/wiki", wikiRouter())
+    router.mountSubRouter("/", indexRouter())
 
     return router
   }
