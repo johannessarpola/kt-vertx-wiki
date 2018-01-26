@@ -3,6 +3,8 @@ package fi.johannes.web
 import com.github.salomonbrys.kodein.*
 import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
 import fi.johannes.data.services.proxy.WikiDatabaseServiceExtFactory
+import fi.johannes.web.handlers.backup.BackupControllers
+import fi.johannes.web.handlers.backup.controllers.BackupController
 import fi.johannes.web.handlers.wiki.WikiControllersExt
 import fi.johannes.web.handlers.wiki.index.Index
 import fi.johannes.web.handlers.wiki.page.Page
@@ -10,7 +12,10 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.logging.Logger
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.client.WebClient
+import io.vertx.ext.web.client.WebClientOptions
 import io.vertx.ext.web.handler.BodyHandler
+import javax.jws.WebService
 
 /**
  * Johannes on 8.1.2018.
@@ -75,6 +80,16 @@ class HttpServerVerticleExt : AbstractVerticle() {
     return router
   }
 
+  private fun backupApiRouter(): Router {
+    val router = Router.router(vertx)
+    val backupControllers = BackupControllers(WebClient.create(vertx, WebClientOptions()))
+    val backupController = backupControllers.injector.instance<BackupController>()
+
+    router.post("/save").handler(backupController::saveBackup)
+
+    return router
+  }
+
   private fun indexRouter(): Router {
     val router = Router.router(vertx)
     val wikiControllers = WikiControllersExt(modules.instance())
@@ -89,7 +104,7 @@ class HttpServerVerticleExt : AbstractVerticle() {
   private fun setupRouter(router: Router): Router {
     router.mountSubRouter("/wiki", wikiRouter())
     router.mountSubRouter("/", indexRouter())
-
+    router.mountSubRouter("/wiki-backup", backupApiRouter())
     return router
   }
 
