@@ -1,15 +1,11 @@
 package fi.johannes.web.handlers.wiki.page
 
 import com.github.rjeschke.txtmark.Processor
-import fi.johannes.web.handlers.wiki.WikiControllerComponents
-import fi.johannes.web.handlers.wiki.WikiControllerComponentsExt
+import fi.johannes.web.handlers.wiki.common.WikiControllerComponentsExt
 import fi.johannes.web.utils.RequestUtils.getParam
 import io.vertx.core.Handler
-import io.vertx.core.eventbus.DeliveryOptions
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import java.util.*
-import io.vertx.core.impl.VertxImpl.context
 import io.vertx.core.AsyncResult
 
 

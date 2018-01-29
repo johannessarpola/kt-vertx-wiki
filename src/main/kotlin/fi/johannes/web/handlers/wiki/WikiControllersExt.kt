@@ -7,6 +7,8 @@ import com.github.salomonbrys.kodein.singleton
 import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
 import fi.johannes.web.handlers.wiki.api.WikiApi
 import fi.johannes.web.handlers.wiki.api.WikiApiImpl
+import fi.johannes.web.handlers.wiki.common.WikiControllerComponentsExt
+import fi.johannes.web.handlers.wiki.common.WikiControllerComponentsImplExt
 import fi.johannes.web.handlers.wiki.index.Index
 import fi.johannes.web.handlers.wiki.index.IndexImplExt
 import fi.johannes.web.handlers.wiki.page.Page
@@ -20,9 +22,10 @@ import io.vertx.ext.web.templ.FreeMarkerTemplateEngine
 class WikiControllersExt(dbService: WikiDatabaseServiceExt) {
 
   val injector = Kodein {
-    bind<WikiControllerComponentsExt>() with singleton { WikiControllerComponentsImplExt(
-      FreeMarkerTemplateEngine.create(),
-      dbService)
+    bind<WikiControllerComponentsExt>() with singleton {
+      WikiControllerComponentsImplExt(
+        FreeMarkerTemplateEngine.create(),
+        dbService)
     }
     bind<Index>() with singleton { IndexImplExt(instance()) }
     bind<Page>() with singleton { PageImplExt(instance()) }

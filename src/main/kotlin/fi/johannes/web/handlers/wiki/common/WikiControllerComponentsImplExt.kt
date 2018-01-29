@@ -1,4 +1,4 @@
-package fi.johannes.web.handlers.wiki
+package fi.johannes.web.handlers.wiki.common
 
 import fi.johannes.data.services.proxy.WikiDatabaseServiceExt
 import io.vertx.ext.web.templ.TemplateEngine

@@ -1,6 +1,6 @@
 package fi.johannes.web.handlers.wiki.index
 
-import fi.johannes.web.handlers.wiki.WikiControllerComponents
+import fi.johannes.web.handlers.wiki.common.WikiControllerComponents
 import io.vertx.core.Handler
 import io.vertx.core.eventbus.DeliveryOptions
 import io.vertx.core.json.JsonObject

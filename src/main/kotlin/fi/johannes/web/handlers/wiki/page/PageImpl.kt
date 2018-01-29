@@ -1,7 +1,7 @@
 package fi.johannes.web.handlers.wiki.page
 
 import com.github.rjeschke.txtmark.Processor
-import fi.johannes.web.handlers.wiki.WikiControllerComponents
+import fi.johannes.web.handlers.wiki.common.WikiControllerComponents
 import fi.johannes.web.utils.RequestUtils.getParam
 import io.vertx.core.Handler
 import io.vertx.core.eventbus.DeliveryOptions

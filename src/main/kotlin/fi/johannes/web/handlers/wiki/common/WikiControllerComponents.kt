@@ -1,4 +1,4 @@
-package fi.johannes.web.handlers.wiki
+package fi.johannes.web.handlers.wiki.common
 
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
