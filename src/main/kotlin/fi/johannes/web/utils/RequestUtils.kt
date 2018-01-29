@@ -13,4 +13,12 @@ object RequestUtils {
     else if(default.isNotEmpty()) return default
     else throw NoSuchFieldError()
   }
+
+  fun getParamInt (name: String, request: HttpServerRequest, default: Int? = null): Int {
+    val p = request.getParam(name).toIntOrNull()
+    if(p != null) return p
+    else if(default != null) return default
+    else throw NoSuchFieldError()
+  }
+
 }

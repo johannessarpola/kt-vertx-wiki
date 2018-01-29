@@ -17,6 +17,9 @@ interface WikiDatabaseServiceExt {
   fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt
 
   @Fluent
+  fun fetchPageById(id: Int, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt
+
+  @Fluent
   fun fetchPage(name: String, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt
 
   @Fluent

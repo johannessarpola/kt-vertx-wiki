@@ -34,6 +34,38 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
 
   }
 
+  private fun pageFetchSuccess(result: io.vertx.ext.sql.ResultSet): JsonObject {
+    val response = JsonObject()
+
+    if (result.getNumRows() == 0) {
+      response.put("found", false)
+    } else {
+      response.put("found", true)
+      val row = result.getResults().get(0)
+      response.put("id", row.getInteger(0))
+        .put("name", row.getString(1))
+        .put("rawContent", row.getString(2))
+    }
+
+    return response
+  }
+
+  override fun fetchPageById(id: Int, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt {
+    val params = JsonArray().add(id)
+
+    pageDao.fetchPageById(params,
+      success = { result: io.vertx.ext.sql.ResultSet ->
+        val response = pageFetchSuccess(result)
+        resultHandler.handle(Future.succeededFuture(response))
+      },
+      error = { error ->
+        LOGGER.error("Database query error", error)
+        resultHandler.handle(Future.failedFuture(error))
+      })
+
+    return this
+  }
+
   override fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {
     pageDao.fetchAllPages(
       success = { result ->
@@ -57,15 +89,7 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
 
     pageDao.fetchPage(params,
       success = { result ->
-        val response = JsonObject()
-        if (result.getNumRows() == 0) {
-          response.put("found", false)
-        } else {
-          response.put("found", true)
-          val row = result.getResults().get(0)
-          response.put("id", row.getInteger(0))
-            .put("rawContent", row.getString(1))
-        }
+        val response = pageFetchSuccess(result)
         resultHandler.handle(Future.succeededFuture(response))
       },
       error = { error ->
@@ -77,8 +101,8 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
   }
 
   private fun daoFail(msg: String = "Database query error",
-                   error: Throwable,
-                   handler: Handler<AsyncResult<Void>>) {
+                      error: Throwable,
+                      handler: Handler<AsyncResult<Void>>) {
     LOGGER.error(msg, error)
     handler.handle(Future.failedFuture(error))
   }

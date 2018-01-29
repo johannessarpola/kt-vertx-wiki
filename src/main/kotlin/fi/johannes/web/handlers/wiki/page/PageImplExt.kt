@@ -23,7 +23,7 @@ class PageImplExt(val components: WikiControllerComponentsExt):Page {
   val EMPTY_PAGE_MARKDOWN = "# A new page\n\n Feel-free to write in Markdown!\n";
 
   override fun get(context: RoutingContext) {
-    val page = getParam("page", context.request());
+    val page = getParam("page", context.request())
 
     components.dbService().fetchPage(page, Handler { reply ->
 
@@ -65,7 +65,7 @@ class PageImplExt(val components: WikiControllerComponentsExt):Page {
     val handler = Handler<AsyncResult<Void>> { reply ->
       if (reply.succeeded()) {
         context.response().setStatusCode(303)
-          .putHeader("Location", "/wiki/" + title)
+          .putHeader("Location", "/wiki/pages/" + title)
           .end()
       } else {
         context.fail(reply.cause())
@@ -83,7 +83,7 @@ class PageImplExt(val components: WikiControllerComponentsExt):Page {
   override fun create(context: RoutingContext) {
     val pageName = getParam(name = "page", request = context.request());
 
-    val location = if (pageName.isEmpty()) "/" else "/wiki/" + pageName;
+    val location = if (pageName.isEmpty()) "/" else "/wiki/pages/" + pageName;
 
     context.response()
       .setStatusCode(303)

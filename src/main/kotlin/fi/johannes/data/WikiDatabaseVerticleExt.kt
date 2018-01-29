@@ -87,6 +87,7 @@ class WikiDatabaseVerticleExt : AbstractVerticle() {
       SqlQuery.CREATE_PAGES_TABLE to props.getProperty("create-pages-table"),
       SqlQuery.ALL_PAGES to props.getProperty("all-pages"),
       SqlQuery.GET_PAGE to props.getProperty("get-page"),
+      SqlQuery.GET_PAGE_BY_ID to props.getProperty("get-page-by-id"),
       SqlQuery.CREATE_PAGE to props.getProperty("create-page"),
       SqlQuery.SAVE_PAGE to props.getProperty("save-page"),
       SqlQuery.DELETE_PAGE to props.getProperty("delete-page")

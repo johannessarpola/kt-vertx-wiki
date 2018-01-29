@@ -4,7 +4,7 @@
 
   <div class="col-md-12 mt-1">
     <div class="float-xs-right">
-      <form class="form-inline" action="/wiki/create" method="post">
+      <form class="form-inline" action="/wiki/pages/create" method="post">
         <div class="form-group">
           <input type="text" class="form-control" id="page" name="page" placeholder="New page name">
         </div>
@@ -19,7 +19,7 @@
     <h2>Pages:</h2>
     <ul>
       <#items as page>
-        <li><a href="/wiki/${page}">${page}</a></li>
+        <li><a href="/wiki/pages/${page}">${page}</a></li>
       </#items>
     </ul>
   <#else>

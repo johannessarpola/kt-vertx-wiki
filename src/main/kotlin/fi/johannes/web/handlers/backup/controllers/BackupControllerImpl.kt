@@ -1,7 +1,7 @@
 package fi.johannes.web.handlers.backup.controllers
 
 import fi.johannes.web.dto.PageDto
-import fi.johannes.web.handlers.backup.client.BackupClient
+import fi.johannes.web.handlers.backup.client.BackupService
 import fi.johannes.web.utils.RequestUtils
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject
@@ -10,15 +10,16 @@ import io.vertx.ext.web.RoutingContext
 /**
  * Johannes on 26.1.2018.
  */
-class BackupControllerImpl(val client: BackupClient) : BackupController {
+class BackupControllerImpl(private val backupService: BackupService) : BackupController {
 
   override fun saveBackup(context: RoutingContext) {
     val request = context.request()
 
+    // todo should probably take in json body and parse from there and not form-data
     val title = RequestUtils.getParam("title", request)
     val markdown = RequestUtils.getParam("markdown", request)
 
-    client.saveBackup(PageDto(title, markdown), Handler { result ->
+    backupService.saveBackup(PageDto(title, markdown), Handler { result ->
       if(result.succeeded()) {
         val responseObj = JsonObject().put("result", "ok")
         context.response().end(responseObj.encodePrettily())

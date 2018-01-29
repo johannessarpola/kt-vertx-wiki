@@ -10,6 +10,10 @@ interface PageDao {
   fun fetchAllPages(success: (ResultSet) -> Unit,
                     error: (Throwable) -> Unit)
 
+  fun fetchPageById(params: JsonArray,
+                    success: (ResultSet) -> Unit,
+                    error: (Throwable) -> Unit)
+
   fun fetchPage(params: JsonArray,
                 success: (ResultSet) -> Unit,
                 error: (Throwable) -> Unit)

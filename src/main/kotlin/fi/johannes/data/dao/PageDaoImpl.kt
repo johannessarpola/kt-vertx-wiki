@@ -66,6 +66,12 @@ class PageDaoImpl(val sqlClient: SQLClient,
     })
   }
 
+  override fun fetchPageById(params: JsonArray, success: (ResultSet) -> Unit, error: (Throwable) -> Unit) {
+    sqlClient.queryWithParams(sqlQueries[SqlQuery.GET_PAGE_BY_ID], params, { res ->
+      fetchHandler(res, success, error)
+    })
+  }
+
   override fun fetchPage(params: JsonArray,
                          success: (ResultSet) -> Unit,
                          error: (Throwable) -> Unit) {
