@@ -13,22 +13,23 @@ class IndexImplExt(val components: WikiControllerComponentsExt) : Index {
   override fun get(context: RoutingContext) {
     val options = DeliveryOptions().addHeader("action", "all-pages")
 
-    components.dbService().fetchAllPages( Handler { reply ->
+    components.dbService().fetchAllPageTitles( Handler { reply ->
       if (reply.succeeded()) {
-        context.put("title", "Wiki home");
-        context.put("pages", reply.result().getList());
+        context.put("title", "Wiki home")
+        val res = reply.result()
+        context.put("pages", res)
         components
           .templateEngine()
           .render(context, "templates", "/index.ftl", { ar ->
             if (ar.succeeded()) {
-              context.response().putHeader("Content-Type", "text/html");
-              context.response().end(ar.result());
+              context.response().putHeader("Content-Type", "text/html")
+              context.response().end(ar.result())
             } else {
-              context.fail(ar.cause());
+              context.fail(ar.cause())
             }
           });
       } else {
-        context.fail(reply.cause());
+        context.fail(reply.cause())
       }
     })
   }

@@ -51,7 +51,7 @@ class WikiDatabaseServiceImplTest {
 
         service?.savePage(pageJson.getInteger("id"), "Yo!", context.asyncAssertSuccess { v2 ->
 
-          service?.fetchAllPages(context.asyncAssertSuccess { array1 ->
+          service?.fetchAllPageTitles(context.asyncAssertSuccess { array1 ->
             context.assertEquals(1, array1.size())
 
             service?.fetchPage("Test", context.asyncAssertSuccess { updatedPageJson ->
@@ -59,7 +59,7 @@ class WikiDatabaseServiceImplTest {
 
               service?.deletePage(pageJson.getInteger("id"), Handler { v3 ->
 
-                service?.fetchAllPages(context.asyncAssertSuccess(Handler { array2 ->
+                service?.fetchAllPageTitles(context.asyncAssertSuccess(Handler { array2 ->
                   context.assertTrue(array2.isEmpty)
                   async.complete()
                 }))

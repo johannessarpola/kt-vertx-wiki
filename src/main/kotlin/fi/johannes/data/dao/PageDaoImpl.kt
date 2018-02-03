@@ -59,8 +59,14 @@ class PageDaoImpl(val sqlClient: SQLClient,
     }
   }
 
-  override fun fetchAllPages(success: (ResultSet) -> Unit,
-                             error: (Throwable) -> Unit) {
+  override fun fetchAllPageTitles(success: (ResultSet) -> Unit,
+                                  error: (Throwable) -> Unit) {
+    sqlClient.query(sqlQueries[SqlQuery.ALL_PAGES_TITLES], { res ->
+      fetchHandler(res, success, error)
+    })
+  }
+
+  override fun fetchAllPages(success: (ResultSet) -> Unit, error: (Throwable) -> Unit) {
     sqlClient.query(sqlQueries[SqlQuery.ALL_PAGES], { res ->
       fetchHandler(res, success, error)
     })

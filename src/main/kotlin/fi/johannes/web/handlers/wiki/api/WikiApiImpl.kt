@@ -1,17 +1,46 @@
 package fi.johannes.web.handlers.wiki.api
 
 import com.github.rjeschke.txtmark.Processor
+import fi.johannes.web.handlers.wiki.base.ApiControllerBase
 import fi.johannes.web.handlers.wiki.common.WikiControllerComponentsExt
+import fi.johannes.web.utils.JsonValidation
 import fi.johannes.web.utils.RequestUtils
 import io.vertx.core.Handler
-import io.vertx.ext.web.RoutingContext
 import io.vertx.core.json.JsonObject
+import io.vertx.core.logging.Logger
+import io.vertx.core.logging.LoggerFactory
+import io.vertx.ext.web.RoutingContext
+import kotlin.streams.toList
 
 
 /**
  * Johannes on 29.1.2018.
  */
-class WikiApiImpl(val components: WikiControllerComponentsExt): WikiApi {
+class WikiApiImpl(val components: WikiControllerComponentsExt) : WikiApi, ApiControllerBase {
+
+  private val LOGGER = LoggerFactory.getLogger(WikiApiImpl::class.java)
+  override fun logger(): Logger = LOGGER
+
+  private fun toIndexObj(obj: JsonObject): JsonObject {
+    return JsonObject()
+      .put("id", obj.getInteger("ID"))
+      .put("name", obj.getString("NAME"))
+      .put("content", obj.getString("CONTENT"))
+      .put("html", Processor.process(obj.getString("CONTENT")))
+  }
+
+  override fun getPages(context: RoutingContext) {
+    components.dbService().fetchAllPages(Handler { reply ->
+      if(reply.succeeded()) {
+        val lst = reply.result().stream().map { toIndexObj(it) }.toList()
+        okResponseWith(context, "pages", lst)
+      }
+      else {
+        errorResponse(context, reply.cause().message)
+      }
+    })
+  }
+
   override fun getPage(context: RoutingContext) {
     val ctxResponse = context.response()
     val id = RequestUtils.getParamInt("id", context.request())
@@ -49,16 +78,31 @@ class WikiApiImpl(val components: WikiControllerComponentsExt): WikiApi {
     })
   }
 
-  override fun savePage(context: RoutingContext) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  override fun updatePage(context: RoutingContext) {
+    val id = Integer.valueOf(context.request().getParam("id"))
+    val page = context.bodyAsJson
+    val onErr = { _: JsonObject -> badRequestResponse(page, context) }
+    if (!JsonValidation.validateAgainstKeys(page, onErr, "markdown")) {
+      return
+    } else {
+      components.dbService().savePage(id, page.getString("markdown"), simpleHandler(context))
+    }
   }
 
+
   override fun createPage(context: RoutingContext) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    val page = context.bodyAsJson
+    val onErr = { _: JsonObject -> badRequestResponse(page, context) }
+    if (!JsonValidation.validateAgainstKeys(page, onErr, "name", "markdown")) {
+      return
+    } else {
+      components.dbService().createPage(page.getString("name"), page.getString("markdown"), simpleHandler(context, successCode = 201))
+    }
   }
 
   override fun deletePage(context: RoutingContext) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    val id = Integer.valueOf(context.request().getParam("id"))
+    components.dbService().deletePage(id, simpleHandler(context))
   }
 
 

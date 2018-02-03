@@ -7,8 +7,11 @@ import io.vertx.ext.sql.ResultSet
  * Johannes on 10.1.2018.
  */
 interface PageDao {
+  fun fetchAllPageTitles(success: (ResultSet) -> Unit,
+                         error: (Throwable) -> Unit)
+
   fun fetchAllPages(success: (ResultSet) -> Unit,
-                    error: (Throwable) -> Unit)
+                         error: (Throwable) -> Unit)
 
   fun fetchPageById(params: JsonArray,
                     success: (ResultSet) -> Unit,

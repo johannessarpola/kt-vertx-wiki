@@ -5,6 +5,7 @@ package fi.johannes.data.enums
  */
 enum class SqlQuery {
   CREATE_PAGES_TABLE,
+  ALL_PAGES_TITLES,
   ALL_PAGES,
   GET_PAGE,
   GET_PAGE_BY_ID,

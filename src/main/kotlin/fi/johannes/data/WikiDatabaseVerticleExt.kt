@@ -85,6 +85,7 @@ class WikiDatabaseVerticleExt : AbstractVerticle() {
   private fun mapQueries(props: Properties): Map<SqlQuery, String> {
     return mapOf(
       SqlQuery.CREATE_PAGES_TABLE to props.getProperty("create-pages-table"),
+      SqlQuery.ALL_PAGES_TITLES to props.getProperty("all-page-titles"),
       SqlQuery.ALL_PAGES to props.getProperty("all-pages"),
       SqlQuery.GET_PAGE to props.getProperty("get-page"),
       SqlQuery.GET_PAGE_BY_ID to props.getProperty("get-page-by-id"),

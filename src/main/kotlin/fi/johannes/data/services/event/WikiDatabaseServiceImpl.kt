@@ -20,7 +20,7 @@ class WikiDatabaseServiceImpl(private val pageDao: PageDao,
   private val LOGGER = LoggerFactory.getLogger(WikiDatabaseServiceExtImpl::class.java)
 
   override fun fetchAllPages(message: Message<JsonObject>) {
-    pageDao.fetchAllPages(
+    pageDao.fetchAllPageTitles(
       success = { result ->
         val pages = result
           .getResults()

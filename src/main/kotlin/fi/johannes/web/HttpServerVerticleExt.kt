@@ -15,7 +15,6 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.logging.Logger
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.handler.BodyHandler
 
 /**
@@ -87,8 +86,11 @@ class HttpServerVerticleExt : AbstractVerticle() {
     val wikiControllers = WikiControllersExt(components.instance())
     val apiController = wikiControllers.injector.instance<WikiApi>()
     router.post().handler(BodyHandler.create())
+    router.get("/pages").handler(apiController::getPages)
     router.get("/pages/:id").handler(apiController::getPage)
-
+    router.post("/pages/:id/update").handler(apiController::updatePage)
+    router.post("/pages/:id/delete").handler(apiController::deletePage)
+    router.post("/pages/create").handler(apiController::createPage)
     return router
   }
 

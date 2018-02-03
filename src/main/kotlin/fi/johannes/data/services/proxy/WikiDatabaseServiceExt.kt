@@ -14,7 +14,10 @@ import io.vertx.core.json.JsonObject
 @ProxyGen
 interface WikiDatabaseServiceExt {
   @Fluent
-  fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt
+  fun fetchAllPageTitles(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt
+
+  @Fluent
+  fun fetchAllPages(resultHandler: Handler<AsyncResult<List<JsonObject>>>): WikiDatabaseServiceExt
 
   @Fluent
   fun fetchPageById(id: Int, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt

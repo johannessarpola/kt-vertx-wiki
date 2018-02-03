@@ -7,7 +7,8 @@ import io.vertx.ext.web.RoutingContext
  */
 interface WikiApi {
   fun getPage(context: RoutingContext)
-  fun savePage(context: RoutingContext)
+  fun getPages(context: RoutingContext)
+  fun updatePage(context: RoutingContext)
   fun createPage(context: RoutingContext)
   fun deletePage(context: RoutingContext)
 }

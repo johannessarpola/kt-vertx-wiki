@@ -66,8 +66,8 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
     return this
   }
 
-  override fun fetchAllPages(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {
-    pageDao.fetchAllPages(
+  override fun fetchAllPageTitles(resultHandler: Handler<AsyncResult<JsonArray>>): WikiDatabaseServiceExt {
+    pageDao.fetchAllPageTitles(
       success = { result ->
         val pages = result
           .getResults()
@@ -83,6 +83,19 @@ class WikiDatabaseServiceExtImpl(val pageDao: PageDao,
       })
     return this
   }
+
+  override fun fetchAllPages(resultHandler: Handler<AsyncResult<List<JsonObject>>>): WikiDatabaseServiceExt {
+    pageDao.fetchAllPages(
+      success = { result ->
+        resultHandler.handle(Future.succeededFuture(result.getRows()))
+      },
+      error = { error ->
+        LOGGER.error("Database query error", error)
+        resultHandler.handle(Future.failedFuture(error))
+      })
+    return this
+  }
+
 
   override fun fetchPage(name: String, resultHandler: Handler<AsyncResult<JsonObject>>): WikiDatabaseServiceExt {
     val params = JsonArray().add(name)
