@@ -86,11 +86,13 @@ class HttpServerVerticleExt : AbstractVerticle() {
     val wikiControllers = WikiControllersExt(components.instance())
     val apiController = wikiControllers.injector.instance<WikiApi>()
     router.post().handler(BodyHandler.create())
+    router.put().handler(BodyHandler.create())
+
     router.get("/pages").handler(apiController::getPages)
     router.get("/pages/:id").handler(apiController::getPage)
-    router.post("/pages/:id/update").handler(apiController::updatePage)
-    router.post("/pages/:id/delete").handler(apiController::deletePage)
-    router.post("/pages/create").handler(apiController::createPage)
+    router.put("/pages/:id").handler(apiController::updatePage)
+    router.delete("/pages/:id").handler(apiController::deletePage)
+    router.post("/pages").handler(apiController::createPage)
     return router
   }
 
